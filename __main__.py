@@ -1,6 +1,9 @@
 from generators.brownian_motion import BROWNIAN_MOTION
 from generators.sabr import SABR
 from visualization.plotter import PLOTTER
+from discriminators.stylized_facts import STYLIZED_FACTS
+import pandas as pd
+import numpy as np
 
 def simulate_brownian_motion(num_simulations):
     """
@@ -18,5 +21,13 @@ def simulate_sabr():
     st, tt = SABR().generate()
     PLOTTER().plot(tt, st, title="SABR")
 
+'''
 simulate_brownian_motion(1)
 simulate_sabr()
+'''
+path = 'data/csv/spy_series/1.csv'
+data1= pd.read_csv(path)
+df = np.array(data1['0'].tolist())
+stylized_facts = STYLIZED_FACTS(df)
+fat_tail_results = stylized_facts.check_fat_tail()
+print(fat_tail_results)

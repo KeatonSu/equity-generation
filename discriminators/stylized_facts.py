@@ -6,27 +6,22 @@ class STYLIZED_FACTS:
     def __init__(self, data):
         self.data = data
 
-    def check_fat_tail(data: np.ndarray, significance_level: float = 0.05) -> bool:
-        """
-        Checks if a stock price time series follows the fat tail phenomenon.
-
-        Parameters:
-        - data (np.ndarray): 1D array of stock prices.
-        - significance_level (float): The significance level for the test (default is 0.05).
-
-        Returns:
-        - bool: True if the series follows the fat tail phenomenon, False otherwise.
-        """
-
-        log_returns = np.diff(np.log(data))
+    def check_fat_tail(self, threshold: float = 1.0) -> bool:
         
-        # Fit the data to a normal distribution
-        _, p_value = stats.kstest(log_returns, 'norm', args=(np.mean(log_returns), np.std(log_returns)))
+        log_returns = np.diff(np.log(self.data))
+        
+        # Calculate kurtosis (using Fisher's definition where normal dist = 0)
+        excess_kurtosis = stats.kurtosis(log_returns)
 
-        if p_value < significance_level:
-            return True 
-        else:
-            return False 
+        # Convert to regular kurtosis (normal dist = 3)
+        kurtosis = excess_kurtosis + 3
+
+         # Print for debugging/information
+        print(f"Distribution kurtosis: {kurtosis:.2f}")
+
+        # Return True if kurtosis is significantly higher than normal distribution
+        print(kurtosis - (3.0 + threshold))
+        return kurtosis > (3.0 + threshold)
         
     def check_volatility_clustering(data: np.ndarray, window_size: int = 5) -> bool:
         """
